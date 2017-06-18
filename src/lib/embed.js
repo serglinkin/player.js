@@ -18,7 +18,8 @@ const oEmbedParameters = [
     'autoplay',
     'autopause',
     'loop',
-    'responsive'
+    'responsive',
+    'background'
 ];
 
 /**
@@ -39,6 +40,13 @@ export function getOEmbedParameters(element, defaults = {}) {
 
         return params;
     }, defaults);
+}
+
+function addBackground(html) {
+  return html.replace(/src="(.[^"]*)"/i, function(match, src, offset, string) {
+    var delimiter = src.indexOf('?') < 0 ? '?' : '&';
+    return 'src="' + src + delimiter + 'background=1"';
+  });
 }
 
 /**
@@ -79,6 +87,9 @@ export function getOEmbedData(videoUrl, params = {}) {
 
             try {
                 const json = JSON.parse(xhr.responseText);
+                if (params.background && json.html){
+                  json.html = addBackground(json.html);
+                }
                 resolve(json);
             }
             catch (error) {
