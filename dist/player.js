@@ -817,7 +817,7 @@ function getVimeoUrl() {
  * @module lib/embed
  */
 
-var oEmbedParameters = ['id', 'url', 'width', 'maxwidth', 'height', 'maxheight', 'portrait', 'title', 'byline', 'color', 'autoplay', 'autopause', 'loop', 'responsive'];
+var oEmbedParameters = ['id', 'url', 'width', 'maxwidth', 'height', 'maxheight', 'portrait', 'title', 'byline', 'color', 'autoplay', 'autopause', 'loop', 'responsive', 'background'];
 
 /**
  * Get the 'data-vimeo'-prefixed attributes from an element as an object.
@@ -839,6 +839,13 @@ function getOEmbedParameters(element) {
 
         return params;
     }, defaults);
+}
+
+function addBackground(html) {
+  return html.replace(/src="(.[^"]*)"/i, function(match, src, offset, string) {
+    var delimiter = src.indexOf('?') < 0 ? '?' : '&';
+    return 'src="' + src + delimiter + 'background=1"';
+  });
 }
 
 /**
@@ -881,6 +888,9 @@ function getOEmbedData(videoUrl) {
 
             try {
                 var json = JSON.parse(xhr.responseText);
+                if (params.background && json.html){
+                  json.html = addBackground(json.html);
+                }
                 resolve(json);
             } catch (error) {
                 reject(error);
